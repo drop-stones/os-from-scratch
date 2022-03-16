@@ -12,12 +12,10 @@ start:
   jmp boot
 
 boot:
-  mov si, HELLO_MSG
-  call Print
   mov si, msg
   call Print
-  mov si, BYE_MSG
-  call Print
+  mov si, msg
+  call PrintHex
 
   cli ; no interrupts
   cld ; all that we need to init
