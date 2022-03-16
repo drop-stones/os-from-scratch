@@ -1,3 +1,7 @@
+;*************************************************
+; io.asm
+;   Simple functions which print string on screen in BIOS
+;*************************************************
 
 ;; constant and variable definitions
 _CurX db 0
@@ -37,6 +41,17 @@ PutChar:
 ; CX = number of times character is dispaly
 ;***************************************;
 PutHexChar:
+  mov bl, al          ; save al into bl
+  shr al, 4           ; al >> 4
+  call PutHexByte     ; print upper numbers as hex
+
+  and bl, 0xf         ; clear upper numbers
+  mov al, bl
+  call PutHexByte
+  
+  ret
+
+PutHexByte:
   cmp al, 0xa
   jl .put_number
   add al, 0x57      ; change 0xa into 'a' in ascii
@@ -80,12 +95,6 @@ PrintHex:
   cmp al, 0
   je .print_hex_done
 
-  mov bl, al          ; save al into bl
-  shr al, 4           ; al >> 4
-  call PutHexChar     ; print upper numbers as hex
-
-  and bl, 0xf         ; clear upper numbers
-  mov al, bl
   call PutHexChar
 
   jmp .print_hex_loop
