@@ -29,5 +29,6 @@ $ ninja qemu
 ## Features
 
 - [x] Bootloader
+- [x] Switch to 32-bit protected mode
 - [ ] Linker
 - [ ] C Runtime
