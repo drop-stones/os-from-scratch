@@ -3,6 +3,8 @@
 ;   Load sectors from floppy disk
 ;*************************************************
 
+[bits 16]
+
 DISK_ERR_MSG db "Disk read error!", 0x0
 
 ;***************************************;
