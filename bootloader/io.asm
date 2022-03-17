@@ -3,6 +3,8 @@
 ;   Simple functions which print string on screen in BIOS
 ;*************************************************
 
+[bits 16]
+
 ;; constant and variable definitions
 _CurX db 0
 _CurY db 0
@@ -101,3 +103,31 @@ PrintHex:
 
 .print_hex_done:
   ret
+
+;***************************************;
+; PrintPM()
+;   - Print a string in protected mode
+; DS:SI = 0 terminated string
+;***************************************;
+[bits 32]
+PrintPM:
+  pusha
+  mov edx, VIDEO_MEMORY   ; set the start of video memory
+
+.print_pm_loop:
+  lodsb             ; load next byte from string from SI to AL
+  cmp al, 0         ; al =? 0 (null-terminated checking)
+  je  .print_pm_done
+
+  mov ah, WHITE_ON_BLACK  ; set attributes
+  mov [edx], ax     ; store char and attributes at current character cell
+  add edx, 2        ; move to next character cell in vedeo memory
+
+  jmp .print_pm_loop
+
+.print_pm_done:
+  popa
+  ret
+
+VIDEO_MEMORY equ 0xb8000
+WHITE_ON_BLACK equ 0x0f
