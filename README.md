@@ -4,8 +4,30 @@
 
 This project is implementation of Operating System for x86 from scratch.
 
+## Compilation
+
+Required dependencies: nasm, CMake, (ninja)
+
+```
+$ git clone https://github.com/drop-stones/os-from-scrach.git
+$ cd os-from-scratch
+$ mkdir build
+$ cd build
+$ cmake -G Ninja .
+$ ninja
+```
+
+## Usage
+
+### Run OS
+
+Required dependencies: qemu-system-x86_64
+```
+$ ninja qemu
+```
+
 ## Features
 
-- [ ] Bootloader
+- [x] Bootloader
 - [ ] Linker
 - [ ] C Runtime
