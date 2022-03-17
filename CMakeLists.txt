@@ -8,24 +8,21 @@ project("OS-from-scratch"
 set(CMAKE_C_COMPILER "/usr/local/bin/clang")
 set(CMAKE_NASM_LINK_EXECUTABLE "ld <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 
+set(DISK_IMG "disk.img")
+
 add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bootloader.asm
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/io.asm
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/disk_load.asm
-  COMMAND nasm -I ${CMAKE_CURRENT_SOURCE_DIR} -f bin ${CMAKE_CURRENT_SOURCE_DIR}/bootloader.asm -o bootloader.bin
+  OUTPUT  ${PROJECT_BINARY_DIR}/${DISK_IMG}
+  DEPENDS BootloaderObj KernelObj
+  COMMAND dd if=/dev/zero of=${DISK_IMG} bs=512 count=2880
+  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/bootloader/bootloader.bin of=${DISK_IMG} bs=512 count=1 seek=0
+  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/os/kernel.bin of=${DISK_IMG} bs=512 count=2 seek=1
 )
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/kernel.bin
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/sample.asm
-  COMMAND nasm -f bin ${CMAKE_CURRENT_SOURCE_DIR}/sample.asm -o kernel.bin
-)
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/disk.img
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin ${CMAKE_CURRENT_BINARY_DIR}/kernel.bin
-  COMMAND dd if=/dev/zero of=disk.img bs=512 count=2880
-  COMMAND dd conv=notrunc if=${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin of=disk.img bs=512 count=1 seek=0
-  COMMAND dd conv=notrunc if=${CMAKE_CURRENT_BINARY_DIR}/kernel.bin of=disk.img bs=512 count=2 seek=1
+add_custom_target(BootDisk ALL DEPENDS ${PROJECT_BINARY_DIR}/${DISK_IMG})
+
+add_custom_target(qemu
+  DEPENDS BootDisk
+  COMMAND qemu-system-x86_64 -machine q35 -fda ${DISK_IMG}
 )
 
-add_custom_target(CreateDisk ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/disk.img)
+add_subdirectory("bootloader")
+add_subdirectory("os")
