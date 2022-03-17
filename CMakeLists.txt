@@ -20,9 +20,12 @@ add_custom_command(
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/sample.asm
   COMMAND nasm -f bin ${CMAKE_CURRENT_SOURCE_DIR}/sample.asm -o kernel.bin
 )
-add_custom_target(BootDisk ALL
-  SOURCES ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin ${CMAKE_CURRENT_BINARY_DIR}/kernel.bin
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/disk.img
+  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin ${CMAKE_CURRENT_BINARY_DIR}/kernel.bin
   COMMAND dd if=/dev/zero of=disk.img bs=512 count=2880
   COMMAND dd conv=notrunc if=${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin of=disk.img bs=512 count=1 seek=0
   COMMAND dd conv=notrunc if=${CMAKE_CURRENT_BINARY_DIR}/kernel.bin of=disk.img bs=512 count=2 seek=1
 )
+
+add_custom_target(CreateDisk ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/disk.img)
