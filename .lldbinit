@@ -1,0 +1,14 @@
+# LLDB execute these commands at startup.
+
+# intel syntax setting
+settings set target.x86-disassembly-flavor intel
+
+# Connect to QEMU
+process connect --plugin gdb-remote connect://localhost:1234
+# gdb-remote localhost:1234
+
+# Set breakpoints
+# breakpoint set -n boot  # 0x7c00
+# breakpoint set --name main  # 0x600
+breakpoint set --address 0x7c00
+breakpoint set --address 0x600
