@@ -1,5 +1,5 @@
 add_custom_command(
-  OUTPUT  ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin
+  OUTPUT bootloader.o bootloader.elf bootloader.sym bootloader.bin
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/bootloader.asm
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/io.asm
   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/disk_load.asm
@@ -10,5 +10,4 @@ add_custom_command(
   COMMAND objcopy --only-keep-debug bootloader.elf bootloader.sym
   COMMAND objcopy -O binary bootloader.elf bootloader.bin
 )
-
-add_custom_target(BootloaderObj ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bootloader.bin)
+add_custom_target(BootloaderBin ALL DEPENDS bootloader.bin)

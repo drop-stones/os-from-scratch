@@ -7,19 +7,19 @@ project("OS-from-scratch"
 
 set(CMAKE_C_COMPILER "/usr/local/bin/clang")
 set(CMAKE_NASM_LINK_EXECUTABLE "ld <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(DISK_IMG "disk.img")
 
 add_custom_command(
-  OUTPUT  ${PROJECT_BINARY_DIR}/${DISK_IMG}
-  # DEPENDS BootloaderObj KernelBin
-  DEPENDS ${PROJECT_BINARY_DIR}/boot/bootloader.bin
-  DEPENDS ${PROJECT_BINARY_DIR}/kernel/kernel.elf
+  OUTPUT  ${DISK_IMG}
+  DEPENDS ${PROJECT_BINARY_DIR}/lib/boot/bootloader.bin
+  DEPENDS ${PROJECT_BINARY_DIR}/lib/kernel/kernel.elf
   COMMAND dd if=/dev/zero of=${DISK_IMG} bs=512 count=2880
-  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/boot/bootloader.bin of=${DISK_IMG} bs=512 count=1 seek=0
-  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/kernel/kernel.elf of=${DISK_IMG} bs=512 count=5 seek=1
+  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/lib/boot/bootloader.bin of=${DISK_IMG} bs=512 count=1 seek=0
+  COMMAND dd conv=notrunc if=${PROJECT_BINARY_DIR}/lib/kernel/kernel.elf of=${DISK_IMG} bs=512 count=5 seek=1
 )
-add_custom_target(BootDisk ALL DEPENDS ${PROJECT_BINARY_DIR}/${DISK_IMG})
+add_custom_target(BootDisk ALL DEPENDS ${DISK_IMG})
 
 add_custom_target(qemu
   DEPENDS BootDisk
@@ -30,6 +30,7 @@ add_custom_target(qemu-debug
   COMMAND qemu-system-x86_64 -machine q35 -fda ${DISK_IMG} -s -S
 )
 
-add_subdirectory("boot")
-add_subdirectory("kernel")
-# add_subdirectory("drivers")
+# message(STATUS "home = ${PROJECT_SOURCE_DIR}")
+include_directories(${PROJECT_SOURCE_DIR}/include/kernel)
+
+add_subdirectory("lib")
