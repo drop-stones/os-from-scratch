@@ -50,7 +50,7 @@ BEGIN_PM:
   mov esi, MSG_PROT_MODE
   call PrintPM
 
-  jmp [KERNEL_OFFSET + 0x18]
+  call [KERNEL_OFFSET + 0x18]
   hlt
 
 ; Global variables
