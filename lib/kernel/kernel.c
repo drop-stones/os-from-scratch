@@ -3,6 +3,10 @@
 
 void main() {
   clear_screen();
-  print("Hello World from kernel!\n");
-  print("Good Bye!!!\n");
+  for (int i = 0; i < 15; i++) {
+    print("Hello World from kernel!\n");
+  }
+  for (int i = 0; i < 15; i++) {
+    print("Good Bye!!!\n");
+  }
 }

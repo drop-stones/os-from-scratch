@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include "util.h"
 #include "low_level.h"
 #include "screen.h"
 
@@ -39,6 +40,31 @@ void set_cursor(int offset) {
   port_byte_out(REG_SCREEN_DATA, (uint8_t)(offset & 0xff));
 }
 
+// Advance the text cursor, scrolling the video buffer if necessary
+int handle_scrolling(int cursor_offset) {
+  // If the cursor is within the screen, return it unmodified
+  if (cursor_offset < MAX_WIDTH * MAX_HEIGHT * 2) {
+    return cursor_offset;
+  }
+
+  // Shift up all Texts in screen
+  for (int i = 0; i < MAX_HEIGHT; i++) {
+    memory_copy((char *)(get_screen_offset(i+1, 0) + VIDEO_ADDRESS),
+                (char *)(get_screen_offset(i, 0) + VIDEO_ADDRESS),
+                MAX_WIDTH * 2);
+  }
+
+  // Blank the last line by settings all bytes to 0
+  char *last_line = (char *)(get_screen_offset(MAX_HEIGHT - 1, 0) + VIDEO_ADDRESS);
+  for (int i = 0; i < MAX_WIDTH * 2; i++) {
+    last_line[i] = 0;
+  }
+
+  // Move cursor position
+  cursor_offset -= MAX_WIDTH * 2;
+  return cursor_offset;
+}
+
 // Print a char on the screen at (col, row), or at cursor position
 void print_char(char character, int col, int row, char attribute_byte) {
   unsigned char *vidmem = (unsigned char *) VIDEO_ADDRESS;
@@ -64,7 +90,7 @@ void print_char(char character, int col, int row, char attribute_byte) {
     offset += 2;
   }
 
-  //offset = handle_scrolling(offset);
+  offset = handle_scrolling(offset);
   set_cursor(offset);
 }
 

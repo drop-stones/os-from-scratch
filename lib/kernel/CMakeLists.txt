@@ -2,6 +2,7 @@ add_library(KernelObj OBJECT
   kernel.c
   low_level.c
   screen.c
+  util.c
 )
 target_compile_options(KernelObj PRIVATE
   -ffreestanding -nostdlib -gdwarf-4 -m32
